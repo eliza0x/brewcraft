@@ -8,13 +8,15 @@ import net.minecraftforge.client.model.ModelLoader
 import net.minecraftforge.fml.common.registry.ForgeRegistries
 
 open class ItemBlockBase (
-        itemID: String,
+        val itemID: String,
         block: Block
 ): ItemBlock(block) {
     init {
         this.setRegistryName(BrewCraft.MOD_ID, itemID)
+    }
+    fun register() {
+        ForgeRegistries.ITEMS.register(this)
         ModelLoader.setCustomModelResourceLocation(this, 0,
                 ModelResourceLocation(BrewCraft.MOD_ID + ":" + itemID, "inventory"))
     }
-    fun register() = ForgeRegistries.ITEMS.register(this)
 }

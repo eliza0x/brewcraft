@@ -8,7 +8,7 @@ import net.minecraftforge.client.model.ModelLoader
 import net.minecraftforge.fml.common.registry.ForgeRegistries
 
 open class ItemFoodBase(
-        itemID: String,
+        val itemID: String,
         amount: Int,
         saturation: Float,
         isWolfFood: Boolean = false,
@@ -19,8 +19,10 @@ open class ItemFoodBase(
         this.setUnlocalizedName(itemID)
         this.setCreativeTab(CreativeTabs.MATERIALS)
         this.setMaxStackSize(maxStackSize)
+    }
+    fun register() {
+        ForgeRegistries.ITEMS.register(this)
         ModelLoader.setCustomModelResourceLocation(this, 0,
                 ModelResourceLocation(BrewCraft.MOD_ID + ":" + itemID, "inventory"))
     }
-    fun register() = ForgeRegistries.ITEMS.register(this)
 }

@@ -12,7 +12,7 @@ import net.minecraftforge.client.model.ModelLoader
 import net.minecraftforge.fml.common.registry.ForgeRegistries
 
 open class BlockContainerBase(
-        itemID: String,
+        val itemID: String,
         tileEntity: TileEntity
 ): BlockContainer(Material.IRON) {
     val tile = tileEntity
@@ -26,8 +26,10 @@ open class BlockContainerBase(
         this.setCreativeTab(CreativeTabs.MATERIALS)
         this.setHardness(0.5F);
         this.setResistance(0.5F);
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0,
-            ModelResourceLocation(BrewCraft.MOD_ID + ":" + itemID, "inventory"))
     }
-    fun register() = ForgeRegistries.BLOCKS.register(this)
+    fun register() {
+        ForgeRegistries.BLOCKS.register(this)
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0,
+                ModelResourceLocation(BrewCraft.MOD_ID + ":" + itemID, "inventory"))
+    }
 }
