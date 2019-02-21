@@ -1,0 +1,15 @@
+{
+  "type": "forge:ore_shapeless",
+  "ingredients": [
+    {
+      "item": "brewcraft:hand_mill",
+      "data": 32767
+    },
+    {
+      "item": "brewcraft:roasted_coffee_bean"
+    }
+  ],
+  "result": {
+    "item": "brewcraft:roasted_coffee_powder"
+  }
+}
