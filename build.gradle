@@ -33,12 +33,20 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    // Kotlin
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$project_kotlin_version"
-    compile "org.jetbrains.kotlin:kotlin-reflect:$project_kotlin_version"
+configurations {
+    embed
+    compile.extendsFrom(embed)
 }
 
+dependencies {
+    embed "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$project_kotlin_version"
+    embed "org.jetbrains.kotlin:kotlin-reflect:$project_kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-gradle-plugin:$project_kotlin_version"
+}
+
+jar {
+	from configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
+}
 
 processResources {
     inputs.property "version", mod_version

@@ -12,12 +12,10 @@ import net.minecraftforge.client.model.ModelLoader
 import net.minecraftforge.fml.common.registry.ForgeRegistries
 
 open class BlockContainerBase(
-        val itemID: String,
-        tileEntity: TileEntity
+        val itemID: String
 ): BlockContainer(Material.IRON) {
-    val tile = tileEntity
-    override fun createNewTileEntity(p0: World, p1: Int): TileEntity {
-        return tile
+    override fun createNewTileEntity(p0: World, p1: Int): TileEntity? {
+        throw NotImplementedError("This is a dummy method")
     }
     init {
         val isBlockContainer: Boolean = true

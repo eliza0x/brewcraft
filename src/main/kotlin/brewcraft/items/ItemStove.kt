@@ -16,42 +16,42 @@ import net.minecraftforge.fml.common.registry.GameRegistry
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.network.NetworkManager
 
-
-
-
 object Stove {
     val itemID: String = "stove"
 
     @SidedProxy(clientSide = "brewcraft.items.StoveClientProxy", serverSide = "brewcraft.items.StoveCommonProxy")
-    val proxy = StoveCommonProxy()
+    var proxy = StoveCommonProxy()
 
+    val itemBlockStove = ItemBlockStove()
     fun register() {
-        proxy.registerTileEntity(TileStove())
+        proxy.registerTileEntity()
         BlockStove.register()
-        ItemBlockStove.register()
+        itemBlockStove.register()
     }
 }
 
 object BlockStove: BlockContainerBase(
-        itemID = itemID,
-        tileEntity = TileStove()
+        itemID = itemID
 ) {
     override fun onBlockClicked(world: World, pos: BlockPos, state: EntityPlayer) {
         val tile: TileEntity? = world.getTileEntity(pos)
-        if (tile is TileStove) {
-            tile.incrementCnt()
-            tile.markDirty()
-            if (!world.isRemote) {
-                BrewCraft.logger!!.info("----------")
-                BrewCraft.logger!!.info("${tile.cnt}")
-                BrewCraft.logger!!.info("${tile.cntCpy}")
-            }
+        if (tile is TileStove && !world.isRemote) {
+          tile.incrementCnt()
+          tile.markDirty()
+          BrewCraft.logger!!.info("----------")
+          BrewCraft.logger!!.info("${tile.hashCode()}")
+          BrewCraft.logger!!.info("${pos}")
+          BrewCraft.logger!!.info("${tile.cnt}")
+          BrewCraft.logger!!.info("${tile.cntCpy}")
         }
         super.onBlockClicked(world, pos, state)
     }
+    override fun createNewTileEntity(p0: World, p1: Int): TileEntity? {
+        return TileStove()
+    }
 }
 
-object ItemBlockStove: ItemBlockBase(
+class ItemBlockStove: ItemBlockBase(
         itemID = Stove.itemID,
         block = BlockStove
 )
@@ -65,14 +65,12 @@ class TileStove: TileEntity() {
     }
 
     override fun readFromNBT(tagCompound: NBTTagCompound) {
-        print("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\n")
         super.readFromNBT(tagCompound)
         this.cnt = tagCompound.getInteger("cnt")
         this.cntCpy = tagCompound.getInteger("cnt")
     }
 
     override fun writeToNBT(tagCompound: NBTTagCompound): NBTTagCompound {
-        print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww\n")
         super.writeToNBT(tagCompound)
         tagCompound.setInteger("cnt", this.cnt)
         return tagCompound
@@ -90,13 +88,13 @@ class TileStove: TileEntity() {
     }
 }
 
-open class StoveCommonProxy() {
+open class StoveCommonProxy {
     open fun getClientWorld(): World? {
         return null
     }
 
-    open fun registerTileEntity(tileEntity: TileEntity) {
-        GameRegistry.registerTileEntity(tileEntity::class.java,
+    open fun registerTileEntity() {
+        GameRegistry.registerTileEntity(TileStove::class.java,
                 ResourceLocation(BrewCraft.MOD_ID + itemID + "_tile"))
     }
 }
@@ -107,8 +105,9 @@ class StoveClientProxy: StoveCommonProxy() {
     }
 
 
-    override fun registerTileEntity(tileEntity: TileEntity) {
-        GameRegistry.registerTileEntity(tileEntity::class.java,
+    override fun registerTileEntity() {
+        GameRegistry.registerTileEntity(TileStove::class.java,
                 ResourceLocation(BrewCraft.MOD_ID + itemID + "_tile"))
     }
 }
+
