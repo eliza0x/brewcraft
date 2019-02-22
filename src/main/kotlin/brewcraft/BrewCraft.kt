@@ -68,5 +68,6 @@ class BrewCraft {
         ItemPlateIron.register()
         ItemRoastedCoffeeBean.register()
         ItemRoastedCoffeePowder.register()
+        ItemTeaLeaf.register()
     }
 }
