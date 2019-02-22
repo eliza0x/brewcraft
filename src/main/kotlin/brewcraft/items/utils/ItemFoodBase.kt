@@ -13,14 +13,14 @@ open class ItemFoodBase(
         saturation: Float,
         isWolfFood: Boolean = false,
         maxStackSize: Int = 64
-) : ItemFood(amount, saturation, isWolfFood) {
+) : ItemFood(amount, saturation, isWolfFood), Registerable {
     init {
         this.setRegistryName(BrewCraft.MOD_ID, itemID)
         this.setUnlocalizedName(itemID)
         this.setCreativeTab(CreativeTabs.MATERIALS)
         this.setMaxStackSize(maxStackSize)
     }
-    fun register() {
+    override fun register() {
         ForgeRegistries.ITEMS.register(this)
         ModelLoader.setCustomModelResourceLocation(this, 0,
                 ModelResourceLocation(BrewCraft.MOD_ID + ":" + itemID, "inventory"))

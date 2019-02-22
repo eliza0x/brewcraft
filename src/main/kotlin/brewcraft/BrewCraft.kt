@@ -2,6 +2,7 @@ package brewcraft
 
 import brewcraft.items.*
 import brewcraft.items.Stove.itemID
+import brewcraft.items.utils.Registerable
 import brewcraft.recipe.BrewingRecipes
 import brewcraft.recipe.SmeltingRecipes
 import net.minecraft.block.Block
@@ -60,13 +61,16 @@ class BrewCraft {
     }
 
     init {
-        Percolator.register()
-        Stove.register()
-        ItemAwkwardCoffee.register()
-        ItemCoffeeBean.register()
-        ItemHandMill.register()
-        ItemPlateIron.register()
-        ItemRoastedCoffeeBean.register()
-        ItemRoastedCoffeePowder.register()
+        val registerable: List<Registerable> = listOf(
+                Percolator,
+                Stove,
+                ItemAwkwardCoffee,
+                ItemCoffeeBean,
+                ItemHandMill,
+                ItemPlateIron,
+                ItemRoastedCoffeeBean,
+                ItemRoastedCoffeePowder
+        )
+        registerable.map{ it.register() }
     }
 }

@@ -4,6 +4,7 @@ import brewcraft.BrewCraft
 import brewcraft.items.Stove.itemID
 import brewcraft.items.utils.BlockContainerBase
 import brewcraft.items.utils.ItemBlockBase
+import brewcraft.items.utils.Registerable
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
@@ -16,14 +17,14 @@ import net.minecraftforge.fml.common.registry.GameRegistry
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.network.NetworkManager
 
-object Stove {
+object Stove: Registerable {
     val itemID: String = "stove"
 
     @SidedProxy(clientSide = "brewcraft.items.StoveClientProxy", serverSide = "brewcraft.items.StoveCommonProxy")
     var proxy = StoveCommonProxy()
 
     val itemBlockStove = ItemBlockStove()
-    fun register() {
+    override fun register() {
         proxy.registerTileEntity()
         BlockStove.register()
         itemBlockStove.register()

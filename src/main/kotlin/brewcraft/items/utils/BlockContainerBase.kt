@@ -11,9 +11,9 @@ import net.minecraft.world.World
 import net.minecraftforge.client.model.ModelLoader
 import net.minecraftforge.fml.common.registry.ForgeRegistries
 
-open class BlockContainerBase(
+open class BlockContainerBase (
         val itemID: String
-): BlockContainer(Material.IRON) {
+): BlockContainer(Material.IRON), Registerable {
     override fun createNewTileEntity(p0: World, p1: Int): TileEntity? {
         throw NotImplementedError("This is a dummy method")
     }
@@ -25,7 +25,7 @@ open class BlockContainerBase(
         this.setHardness(0.5F);
         this.setResistance(0.5F);
     }
-    fun register() {
+    override fun register() {
         ForgeRegistries.BLOCKS.register(this)
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0,
                 ModelResourceLocation(BrewCraft.MOD_ID + ":" + itemID, "inventory"))

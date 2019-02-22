@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries
 
 open class BlockBase (
         val itemID: String
-) : Block(Material.IRON) {
+) : Block(Material.IRON), Registerable {
         init {
                 this.setRegistryName(BrewCraft.MOD_ID, itemID)
                 this.setUnlocalizedName(itemID)
@@ -21,7 +21,7 @@ open class BlockBase (
                 this.setHardness(0.5F);
                 this.setResistance(0.5F);
         }
-    fun register() {
+    override fun register() {
         ForgeRegistries.BLOCKS.register(this)
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0,
                 ModelResourceLocation(BrewCraft.MOD_ID + ":" + itemID, "inventory"))
