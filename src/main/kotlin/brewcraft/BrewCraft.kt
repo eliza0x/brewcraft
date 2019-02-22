@@ -1,22 +1,21 @@
 package brewcraft
 
 import brewcraft.items.*
-import brewcraft.items.Stove.itemID
 import brewcraft.recipe.BrewingRecipes
 import brewcraft.recipe.SmeltingRecipes
+import brewcraft.util.RegisterableItem
+import brewcraft.util.RegisterableModel
 import net.minecraft.block.Block
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.util.ResourceLocation
+import net.minecraftforge.client.event.ModelRegistryEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.RegistryEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.registry.GameRegistry
 import org.apache.logging.log4j.Logger
-import javax.annotation.Resource
 
 @Mod(
         modid = BrewCraft.MOD_ID,
@@ -39,10 +38,43 @@ class BrewCraft {
         MinecraftForge.addGrassSeed(ItemStack(CoffeeBean), 2)
     }
 
-    @SubscribeEvent
-    fun registerBlocks(event: RegistryEvent.Register<Block>) {}
+    init {
+        val registerableItem: List<RegisterableItem> = listOf(
+            SmeltingRecipes,
+            BrewingRecipes,
+            Percolator,
+            Stove,
+            ItemAwkwardCoffee,
+            ItemCoffeeBean,
+            ItemHandMill,
+            ItemPlateIron,
+            ItemRoastedCoffeeBean,
+            ItemRoastedCoffeePowder,
+            ItemTeaLeaf
+        )
+        registerableItem.map{ it.registerItem() }
+
+
+        val registerableModel: List<RegisterableModel> = listOf(
+            Percolator,
+            Stove,
+            ItemAwkwardCoffee,
+            ItemCoffeeBean,
+            ItemHandMill,
+            ItemPlateIron,
+            ItemRoastedCoffeeBean,
+            ItemRoastedCoffeePowder,
+            ItemTeaLeaf
+        )
+        registerableModel.map{ it.registerModel() }
+    }
 
     companion object {
+        // @SubscribeEvent @JvmStatic
+        // fun registerItems(event: RegistryEvent.Register<Item>) {}
+        // @SubscribeEvent @JvmStatic
+        // fun registerModels(event: ModelRegistryEvent) {}
+
         const val MOD_ID = "brewcraft"
         const val NAME = "BrewCraft"
         const val VERSION = "1.0"
@@ -54,20 +86,5 @@ class BrewCraft {
         val CoffeeBean: Item = ItemCoffeeBean
         val RoastedCoffeeBean: Item = ItemRoastedCoffeeBean
         val RoastedCoffeePowder: Item = ItemRoastedCoffeePowder
-
-        val AddSmeltingRecipes: SmeltingRecipes = SmeltingRecipes
-        val AddBrewingRecipes: BrewingRecipes = BrewingRecipes
-    }
-
-    init {
-        Percolator.register()
-        Stove.register()
-        ItemAwkwardCoffee.register()
-        ItemCoffeeBean.register()
-        ItemHandMill.register()
-        ItemPlateIron.register()
-        ItemRoastedCoffeeBean.register()
-        ItemRoastedCoffeePowder.register()
-        ItemTeaLeaf.register()
     }
 }

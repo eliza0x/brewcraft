@@ -2,12 +2,19 @@ package brewcraft.items
 
 import brewcraft.items.utils.BlockBase
 import brewcraft.items.utils.ItemBlockBase
+import brewcraft.util.RegisterableItem
+import brewcraft.util.RegisterableModel
 
-object Percolator {
+object Percolator: RegisterableItem, RegisterableModel {
         val itemID: String = "percolator"
-        fun register() {
-                BlockPercolator.register()
-                ItemBlockPercolator.register()
+        override fun registerModel() {
+                BlockPercolator.registerModel()
+                ItemBlockPercolator.registerModel()
+        }
+        override fun registerItem() {
+                BlockPercolator.registerItem()
+                ItemBlockPercolator.registerItem()
+
         }
 }
 
