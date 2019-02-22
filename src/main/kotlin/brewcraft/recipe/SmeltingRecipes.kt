@@ -3,9 +3,10 @@ package brewcraft.recipe
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.registry.GameRegistry
 import brewcraft.BrewCraft
+import brewcraft.util.RegisterableItem
 
-object SmeltingRecipes {
-    init {
+object SmeltingRecipes: RegisterableItem {
+    override fun registerItem() {
         // roast coffee bean
         GameRegistry.addSmelting(
                 ItemStack(BrewCraft.CoffeeBean),
