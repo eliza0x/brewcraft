@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries
 
 open class BlockContainerBase (
         val itemID: String
-): BlockContainer(Material.IRON), RegisterableItem, RegisterableModel {
+): BlockContainer(Material.SAND), RegisterableItem, RegisterableModel {
     override fun createNewTileEntity(p0: World, p1: Int): TileEntity? {
         throw NotImplementedError("This is a dummy method")
     }

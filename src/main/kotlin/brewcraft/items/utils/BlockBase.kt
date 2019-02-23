@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries
 
 open class BlockBase (
         val itemID: String
-) : Block(Material.IRON), RegisterableModel, RegisterableItem {
+) : Block(Material.SAND), RegisterableModel, RegisterableItem {
         init {
                 this.setRegistryName(BrewCraft.MOD_ID, itemID)
                 this.setUnlocalizedName(itemID)
