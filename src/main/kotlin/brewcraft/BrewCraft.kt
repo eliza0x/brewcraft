@@ -50,7 +50,8 @@ class BrewCraft {
             ItemPlateIron,
             ItemRoastedCoffeeBean,
             ItemRoastedCoffeePowder,
-            ItemTeaLeaf
+            ItemTeaLeaf,
+                ItemKopiLuwak
         )
         registerableItem.map{ it.registerItem() }
 
@@ -64,7 +65,8 @@ class BrewCraft {
             ItemPlateIron,
             ItemRoastedCoffeeBean,
             ItemRoastedCoffeePowder,
-            ItemTeaLeaf
+            ItemTeaLeaf,
+                ItemKopiLuwak
         )
         registerableModel.map{ it.registerModel() }
     }
