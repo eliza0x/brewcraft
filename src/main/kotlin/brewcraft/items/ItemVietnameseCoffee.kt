@@ -1,7 +1,9 @@
 package brewcraft.items
 
-import brewcraft.items.utils.ItemBase
+import brewcraft.items.utils.ItemFoodBase
 
-object ItemVietnameseCoffee : ItemBase(
-        itemID = "vietnamese_coffee"
+object ItemVietnameseCoffee : ItemFoodBase(
+        itemID = "vietnamese_coffee",
+        amount = 4,
+        saturation = 1.2F
 )
