@@ -51,6 +51,8 @@ class BrewCraft {
             ItemRoastedCoffeeBean,
             ItemRoastedCoffeePowder,
             ItemTeaLeaf,
+            ItemKopiLuwak,
+            ItemCoffeeFruit,
             Barrel,
             ItemAcorn,
             ItemKopiLuwak
@@ -68,6 +70,8 @@ class BrewCraft {
             ItemRoastedCoffeeBean,
             ItemRoastedCoffeePowder,
             ItemTeaLeaf,
+            ItemKopiLuwak,
+            ItemCoffeeFruit,
             Barrel,
             ItemAcorn,
             ItemKopiLuwak
