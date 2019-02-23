@@ -1,0 +1,8 @@
+{
+  "parent": "brewcraft:block/barrel_surface",
+  "textures": {
+    "top": "brewcraft:blocks/barrel_top",
+    "side": "brewcraft:blocks/barrel_side",
+    "bottom": "brewcraft:blocks/barrel_bottom"
+  }
+}
