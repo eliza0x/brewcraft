@@ -1,6 +1,5 @@
 package brewcraft.items
 
-
 import brewcraft.items.utils.ItemFoodBase
 
 object ItemVietnameseCoffee : ItemFoodBase(
