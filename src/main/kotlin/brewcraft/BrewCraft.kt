@@ -29,6 +29,15 @@ class BrewCraft {
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
         logger = event.modLog
+
+        Percolator.register()
+        Stove.register()
+        ItemAwkwardCoffee.register()
+        ItemCoffeeBean.register()
+        ItemHandMill.register()
+        ItemPlateIron.register()
+        ItemRoastedCoffeeBean.register()
+        ItemRoastedCoffeePowder.register()
     }
 
     @Mod.EventHandler
@@ -47,8 +56,11 @@ class BrewCraft {
         const val NAME = "BrewCraft"
         const val VERSION = "1.0"
         const val MOD_ACCEPTED_MV_VERSIONS = "[1.12.2]"
-
         var logger: Logger? = null
+
+
+        @Mod.Instance(MOD_ID) @JvmStatic
+        lateinit var instance: BrewCraft
 
         val AwkwardCoffee: Item = ItemAwkwardCoffee
         val CoffeeBean: Item = ItemCoffeeBean
@@ -57,16 +69,5 @@ class BrewCraft {
 
         val AddSmeltingRecipes: SmeltingRecipes = SmeltingRecipes
         val AddBrewingRecipes: BrewingRecipes = BrewingRecipes
-    }
-
-    init {
-        Percolator.register()
-        Stove.register()
-        ItemAwkwardCoffee.register()
-        ItemCoffeeBean.register()
-        ItemHandMill.register()
-        ItemPlateIron.register()
-        ItemRoastedCoffeeBean.register()
-        ItemRoastedCoffeePowder.register()
     }
 }
