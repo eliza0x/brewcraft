@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.SidedProxy
 import net.minecraftforge.fml.common.registry.GameRegistry
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.network.NetworkManager
+import java.lang.Exception
 
 
 object Barrel: RegisterableItem, RegisterableModel {
@@ -58,7 +59,7 @@ class ItemBlockBarrel: ItemBlockBase(
 )
 
 class TileBarrel: TileEntity() {
-    private val storedItems: BarrelItems = BarrelItems()
+    private val storedContainer: BarrelContainer = BarrelContainer()
 
     override fun readFromNBT(tagCompound: NBTTagCompound) {
         super.readFromNBT(tagCompound)
@@ -104,7 +105,7 @@ class ClientProxyBarrel: CommonProxyBarrel() {
     }
 }
 
-data class BarrelItems(
+data class BarrelContainer(
         val items: MutableMap<Item, Int> = mutableMapOf()
 ) {
     fun itemIntoBarrel(item: Item) {
@@ -112,20 +113,31 @@ data class BarrelItems(
     }
 }
 
-data class BarrelRecipe (
-    val recipes: Map<Item, Interval>
-) {
-    fun matchOf(barrelItems: BarrelItems): Boolean {
-        return barrelItems.items.all { barrelItem ->
-            recipes[barrelItem.key] ?. isInside(barrelItem.value) ?: false
-        }
-    }
-}
+object BarrelRecipe {
+    private val recipes: MutableMap<Item, Map<Item, ClosedRange<Int>>> = mutableMapOf()
 
-// startAt <= x <= endAt
-data class Interval (
-        val startAt: Int,
-        val endAt: Int
-) {
-    fun isInside(n: Int): Boolean = startAt <= n && n <= endAt
+    fun register(result: Item, vararg recipe: Pair<Item, ClosedRange<Int>>) {
+        // すでにレシピが登録されていた場合例外
+        if (recipes[result] != null) {
+            throw Exception("This recipe is already registered.")
+        }
+        recipes[result] = recipe.toMap()
+    }
+
+    fun matchOf(barrelContainer: BarrelContainer): Item? {
+        // O(N^2), 木を作れば高速化できるがそこまでやる必要があるか不明
+        val barrelItems: List<Pair<Item, Int>> = barrelContainer.items.toList()
+        recipes.forEach { recipe ->
+            val result: Item = recipe.key
+            val recipe: Map<Item, ClosedRange<Int>> = recipe.value
+            if (recipe.size == barrelItems.size) {
+                if (barrelItems.all { item ->
+                    recipe[item.first] ?. contains(item.second) ?: false
+                }) {
+                    return result
+                }
+            }
+        }
+        return null
+    }
 }
