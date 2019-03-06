@@ -21,8 +21,8 @@ import net.minecraft.network.NetworkManager
 object Stove: RegisterableItem, RegisterableModel {
     val itemID: String = "stove"
 
-    @SidedProxy(clientSide = "brewcraft.items.StoveClientProxy", serverSide = "brewcraft.items.StoveCommonProxy")
-    var proxy = StoveCommonProxy()
+    @SidedProxy(clientSide = "brewcraft.items.ClientProxyStove", serverSide = "brewcraft.items.CommonProxyStove")
+    var proxy = CommonProxyStove()
 
     val itemBlockStove = ItemBlockStove()
     override fun registerItem() {
@@ -94,7 +94,7 @@ class TileStove: TileEntity() {
     }
 }
 
-open class StoveCommonProxy {
+open class CommonProxyStove {
     open fun getClientWorld(): World? {
         return null
     }
@@ -105,7 +105,7 @@ open class StoveCommonProxy {
     }
 }
 
-class StoveClientProxy: StoveCommonProxy() {
+class ClientProxyStove: CommonProxyStove() {
     override fun getClientWorld(): World? {
         return FMLClientHandler.instance().worldClient
     }
