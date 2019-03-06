@@ -55,7 +55,9 @@ class BrewCraft {
             ItemVietnameseCoffee,
             ItemCoffeeFruit,
             Barrel,
-            ItemAcorn
+            ItemAcorn,
+            ItemKopiLuwak,
+            ItemNewMakeSpirit
         )
         registerableItem.map{ it.registerItem() }
 
@@ -74,7 +76,9 @@ class BrewCraft {
             ItemVietnameseCoffee,
             ItemCoffeeFruit,
             Barrel,
-            ItemAcorn
+            ItemAcorn,
+            ItemKopiLuwak,
+            ItemNewMakeSpirit
         )
         registerableModel.map{ it.registerModel() }
     }
