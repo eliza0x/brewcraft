@@ -19,22 +19,20 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.network.NetworkManager
 import java.lang.Exception
 
-
 object Barrel: RegisterableItem, RegisterableModel {
     val itemID: String = "barrel"
 
     @SidedProxy(clientSide = "brewcraft.items.ClientProxyBarrel", serverSide = "brewcraft.items.CommonProxyBarrel")
     var proxy = CommonProxyBarrel()
 
-    val itemBlockBarrel = ItemBlockBarrel()
     override fun registerItem() {
         proxy.registerTileEntity()
         BlockBarrel.registerItem()
-        itemBlockBarrel.registerItem()
+        ItemBlockBarrel.registerItem()
     }
     override fun registerModel() {
         BlockBarrel.registerModel()
-        itemBlockBarrel.registerModel()
+        ItemBlockBarrel.registerModel()
     }
 }
 
@@ -53,8 +51,8 @@ object BlockBarrel: BlockContainerBase(
     }
 }
 
-class ItemBlockBarrel: ItemBlockBase(
-        itemID = Stove.itemID,
+object ItemBlockBarrel: ItemBlockBase(
+        itemID = Barrel.itemID,
         block = BlockBarrel
 )
 
@@ -116,9 +114,10 @@ data class BarrelContainer(
 object BarrelRecipe {
     private val recipes: MutableMap<Item, Map<Item, ClosedRange<Int>>> = mutableMapOf()
 
+    // TODO: 時間も設定できるように, 樽の材質で結果を変更させても良い
     fun register(result: Item, vararg recipe: Pair<Item, ClosedRange<Int>>) {
-        // すでにレシピが登録されていた場合例外
-        if (recipes[result] != null) {
+        // すでに同じレシピが登録されていた場合例外
+        if (recipes[result] == recipe.toMap()) {
             throw Exception("This recipe is already registered.")
         }
         recipes[result] = recipe.toMap()

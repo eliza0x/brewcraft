@@ -1,6 +1,7 @@
 package brewcraft
 
 import brewcraft.items.*
+import brewcraft.recipe.BarrelRecipes
 import brewcraft.recipe.BrewingRecipes
 import brewcraft.recipe.SmeltingRecipes
 import brewcraft.util.RegisterableItem
@@ -39,9 +40,14 @@ class BrewCraft {
     }
 
     init {
+        val registerableRecipes: List<RegisterableItem> = listOf(
+                SmeltingRecipes,
+                BrewingRecipes,
+                BarrelRecipes
+        )
+        registerableRecipes.map{ it.registerItem() }
+
         val registerableItem: List<RegisterableItem> = listOf(
-            SmeltingRecipes,
-            BrewingRecipes,
             Percolator,
             Stove,
             ItemAwkwardCoffee,
@@ -53,7 +59,8 @@ class BrewCraft {
             ItemTeaLeaf,
             Barrel,
             ItemAcorn,
-            ItemKopiLuwak
+            ItemKopiLuwak,
+            ItemWhiskey
         )
         registerableItem.map{ it.registerItem() }
 
@@ -70,7 +77,8 @@ class BrewCraft {
             ItemTeaLeaf,
             Barrel,
             ItemAcorn,
-            ItemKopiLuwak
+            ItemKopiLuwak,
+            ItemWhiskey
         )
         registerableModel.map{ it.registerModel() }
     }
