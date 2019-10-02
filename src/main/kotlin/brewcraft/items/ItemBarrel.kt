@@ -11,7 +11,6 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.minecraftforge.fml.client.FMLClientHandler
@@ -19,12 +18,11 @@ import net.minecraftforge.fml.common.SidedProxy
 import net.minecraftforge.fml.common.registry.GameRegistry
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.network.NetworkManager
-import net.minecraft.util.EnumFacing
-import net.minecraft.util.EnumHand
+import net.minecraft.util.*
 import java.lang.Exception
 
 object Barrel: RegisterableItem, RegisterableModel {
-    val itemID: String = "barrel"
+    const val itemID: String = "barrel"
 
     @SidedProxy(clientSide = "brewcraft.items.ClientProxyBarrel", serverSide = "brewcraft.items.CommonProxyBarrel")
     var proxy = CommonProxyBarrel()
@@ -43,6 +41,7 @@ object Barrel: RegisterableItem, RegisterableModel {
 object BlockBarrel: BlockContainerBase(
         itemID = Barrel.itemID
 ) {
+    // アイテムの投入
     override fun onBlockActivated(world: World, pos: BlockPos, state: IBlockState, player: EntityPlayer, hand: EnumHand, facing: EnumFacing, x: Float, y: Float, z: Float): Boolean {
         val tile: TileEntity? = world.getTileEntity(pos)
         val heldItem: Item = player.getHeldItem(EnumHand.MAIN_HAND).item
@@ -51,14 +50,15 @@ object BlockBarrel: BlockContainerBase(
             declPlayerInventryCurrenyItem(player)
             tile.markDirty()
 
-            for (i in tile.container.items.toList()) {
+            for (i in tile.container.getItems().toList()) {
                 println("${i.first.unlocalizedName} - ${i.second}")
             }
         }
         return super.onBlockActivated(world, pos, state, player, hand, facing, x, y, z)
     }
 
-    fun declPlayerInventryCurrenyItem(player: EntityPlayer) {
+    // 投入されたアイテムをプレイヤーから引く
+    private fun declPlayerInventryCurrenyItem(player: EntityPlayer) {
         val heldItemStack: ItemStack = player.getHeldItem(EnumHand.MAIN_HAND)
         // プレイヤーの手持ちを減少
         heldItemStack.count--
@@ -78,12 +78,18 @@ object ItemBlockBarrel: ItemBlockBase(
         block = BlockBarrel
 )
 
-class TileBarrel: TileEntity() {
+class TileBarrel: TileEntity(), ITickable {
     val container: BarrelContainer = BarrelContainer()
 
+    override fun update() {
+        container.updateTick()
+    }
+
+    /*
     override fun readFromNBT(tagCompound: NBTTagCompound) {
         super.readFromNBT(tagCompound)
     }
+    */
 
     override fun writeToNBT(tagCompound: NBTTagCompound): NBTTagCompound {
         super.writeToNBT(tagCompound)
@@ -97,7 +103,7 @@ class TileBarrel: TileEntity() {
     }
 
     override fun onDataPacket(net: NetworkManager?, pkt: SPacketUpdateTileEntity?) {
-        val tag = pkt!!.nbtCompound
+        // val tag = pkt!!.nbtCompound
         //Handle your Data
     }
 }
@@ -126,73 +132,90 @@ class ClientProxyBarrel: CommonProxyBarrel() {
 }
 
 data class BarrelContainer(
-        val items: MutableMap<Item, Int> = mutableMapOf(),
-        private var internalLiquidCapacity: Int = 0,
+        private val items: MutableMap<Item, Int> = mutableMapOf(),
         private val maxInternalLiquidCapacity: Int = 1,
-        private var internalItemCapacity: Int = 0,
-        private val maxInternalItemCapacity: Int = 32
+        private val maxInternalItemCapacity: Int = 32,
+        private var resultRecipe: Recipe? = null, // バレルの中身が変化するのに必要な制約と材料、結果
+        private var sinceLastUpdatedAt: Int = 0 // バレルの内容が更新されてから何tick経ったか
 ) {
-    fun canIntoItem(item: Item): Boolean {
-        return canIntoItemVearias(item) && canIntoItemCapacity(item)
-    }
+    fun getItems(): Map<Item, Int> = items
 
-    private fun canIntoItemVearias(item: Item): Boolean {
-        val list: List<Item> = listOf(
-                Item.getByNameOrId("minecraft:wheat")!!,
-                Item.getByNameOrId("minecraft:water_bucket")!!,
-                Item.getByNameOrId("brewcraft:new_make_spirit")!!
-        )
-        return list.contains(item)
-    }
-    private fun canIntoItemCapacity(item: Item): Boolean {
-        if (isLiquid(item)) {
-            return internalLiquidCapacity < maxInternalLiquidCapacity
-        } else {
-            return internalItemCapacity < maxInternalItemCapacity
+    fun updateTick() {
+        sinceLastUpdatedAt += 1
+        val recipe = resultRecipe
+        if (recipe != null && recipe.neccesaryTick <= sinceLastUpdatedAt) {
+            sinceLastUpdatedAt = 0
+            items.clear()
+            itemIntoBarrel(recipe.result)
         }
     }
-    // TODO: Liquid判定をItemに付けられるようにする, LiquidInterfaceかなにか？
-    fun isLiquid(item: Item): Boolean {
-         val list: List<Item> = listOf(
-                Item.getByNameOrId("minecraft:water_bucket")!!,
-                Item.getByNameOrId("brewcraft:new_make_spirit")!!
-        )
-        return list.contains(item)
-    }
+
+    fun canIntoItem(item: Item): Boolean = isPutAbleItem(item) && isSafeCapacity(item)
+
     fun itemIntoBarrel(item: Item) {
         items[item] = 1 + (items[item] ?: 0)
-        if (isLiquid(item)) { internalLiquidCapacity++ } else { internalItemCapacity++ }
+        // 毎tick計算すると重いので、アイテム追加時に計算
+        resultRecipe = BarrelRecipe.matchOf(items.toList())
+        println("recipe: " + (resultRecipe?.result?.unlocalizedName?:"null"))
+    }
+
+    private fun isSafeCapacity(item: Item): Boolean {
+        return if (isLiquid(item)) {
+            val internalLiquidCapacity: Int = items.filter { isLiquid(it.key) }.map { it.value }.sum()
+            internalLiquidCapacity < maxInternalLiquidCapacity
+        } else {
+            val internalItemCapacity: Int = items.filter { !isLiquid(it.key) }.map { it.value }.sum()
+            internalItemCapacity < maxInternalItemCapacity
+        }
+    }
+
+    private fun isPutAbleItem(item: Item): Boolean {
+        return setOf(
+                Item.getByNameOrId("minecraft:wheat")!!,
+                Item.getByNameOrId("minecraft:water_bucket")!!,
+                Item.getByNameOrId("brewcraft:new_make_spirit")!!,
+                Item.getByNameOrId("brewcraft:whiskey")!!
+        ).contains(item)
+    }
+
+    // TODO: Liquid判定をItemに付けられるようにする, LiquidInterfaceかなにか？
+    private fun isLiquid(item: Item): Boolean {
+         return setOf(
+                Item.getByNameOrId("minecraft:water_bucket")!!,
+                Item.getByNameOrId("brewcraft:new_make_spirit")!!,
+                Item.getByNameOrId("brewcraft:whiskey")!!
+        ).contains(item)
     }
 }
 
-data class BarrelMaterial(
+data class Recipe(
+       val result: Item,
        val neccesaryTick: Int,
        val material: Map<Item, IntRange>
 )
 
 object BarrelRecipe {
-    private val recipes: MutableMap<Item, BarrelMaterial> = mutableMapOf()
+    private val recipes: MutableMap<Item, Recipe> = mutableMapOf()
 
     // TODO: 時間も設定できるように, 樽の材質で結果を変更させても良い
     fun register(result: Item, neccesaryTick: Int, vararg newRecipe: Pair<Item, IntRange>) {
         // すでに同じレシピが登録されていた場合例外
+        // 同じアイテムを作るレシピはok
         if (recipes[result]?.material == newRecipe) {
             throw Exception("This recipe is already registered.")
         }
-        recipes[result] = BarrelMaterial(neccesaryTick, newRecipe.toMap())
+        recipes[result] = Recipe(result, neccesaryTick, newRecipe.toMap())
     }
 
-    fun matchOf(barrelContainer: BarrelContainer): Item? {
-        // O(N^2), 木を作れば高速化できるがそこまでやる必要があるか不明
-        val barrelItems: List<Pair<Item, Int>> = barrelContainer.items.toList()
+    fun matchOf(materials: List<Pair<Item, Int>>): Recipe? {
+        // O(N^3), 木を作れば高速化できるがそこまでやる必要があるか不明
         recipes.forEach { recipe ->
-            val result: Item = recipe.key
-            val recipe: Map<Item, IntRange> = recipe.value.material
-            if (recipe.size == barrelItems.size) {
-                if (barrelItems.all { item ->
-                    recipe[item.first] ?. contains(item.second) ?: false
+            val recipeRequiredMaterials: Map<Item, IntRange> = recipe.value.material
+            if (recipeRequiredMaterials.size == materials.size) {
+                if (materials.all { item ->
+                    recipeRequiredMaterials[item.first] ?. contains(item.second) ?: false
                 }) {
-                    return result
+                    return recipe.value
                 }
             }
         }
