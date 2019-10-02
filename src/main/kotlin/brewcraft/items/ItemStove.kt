@@ -1,7 +1,6 @@
 package brewcraft.items
 
 import brewcraft.BrewCraft
-import brewcraft.items.Stove.itemID
 import brewcraft.items.utils.BlockContainerBase
 import brewcraft.items.utils.ItemBlockBase
 import brewcraft.util.RegisterableItem
@@ -21,23 +20,22 @@ import net.minecraft.network.NetworkManager
 object Stove: RegisterableItem, RegisterableModel {
     val itemID: String = "stove"
 
-    @SidedProxy(clientSide = "brewcraft.items.StoveClientProxy", serverSide = "brewcraft.items.StoveCommonProxy")
-    var proxy = StoveCommonProxy()
+    @SidedProxy(clientSide = "brewcraft.items.ClientProxyStove", serverSide = "brewcraft.items.CommonProxyStove")
+    var proxy = CommonProxyStove()
 
-    val itemBlockStove = ItemBlockStove()
     override fun registerItem() {
         proxy.registerTileEntity()
         BlockStove.registerItem()
-        itemBlockStove.registerItem()
+        ItemBlockStove.registerItem()
     }
     override fun registerModel() {
         BlockStove.registerModel()
-        itemBlockStove.registerModel()
+        ItemBlockStove.registerModel()
     }
 }
 
 object BlockStove: BlockContainerBase(
-        itemID = itemID
+        itemID = Stove.itemID
 ) {
     override fun onBlockClicked(world: World, pos: BlockPos, state: EntityPlayer) {
         val tile: TileEntity? = world.getTileEntity(pos)
@@ -57,7 +55,7 @@ object BlockStove: BlockContainerBase(
     }
 }
 
-class ItemBlockStove: ItemBlockBase(
+object ItemBlockStove: ItemBlockBase(
         itemID = Stove.itemID,
         block = BlockStove
 )
@@ -94,26 +92,25 @@ class TileStove: TileEntity() {
     }
 }
 
-open class StoveCommonProxy {
+open class CommonProxyStove {
     open fun getClientWorld(): World? {
         return null
     }
 
     open fun registerTileEntity() {
         GameRegistry.registerTileEntity(TileStove::class.java,
-                ResourceLocation(BrewCraft.MOD_ID + itemID + "_tile"))
+                ResourceLocation(BrewCraft.MOD_ID + Stove.itemID + "_tile"))
     }
 }
 
-class StoveClientProxy: StoveCommonProxy() {
+class ClientProxyStove: CommonProxyStove() {
     override fun getClientWorld(): World? {
         return FMLClientHandler.instance().worldClient
     }
 
-
     override fun registerTileEntity() {
         GameRegistry.registerTileEntity(TileStove::class.java,
-                ResourceLocation(BrewCraft.MOD_ID + itemID + "_tile"))
+                ResourceLocation(BrewCraft.MOD_ID + Stove.itemID + "_tile"))
     }
 }
 
